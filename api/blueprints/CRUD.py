@@ -14,14 +14,22 @@ class crud_link(Resource):
         self.path_file = os.path.join(os.getcwd(), "api","blueprints", "raw-data", "data.json")
 
     def post(self):
-        data = request.args.get("url")
-        if url(data):
+
+        dados = request.get_json()
+
+        if url(dados.get("url")):
+
             with open(self.path_file, "r") as file:
+
                 links_existentes = json.loads(file.read())
-                alias_link = request.args.get("alias")
+
+                alias_link = dados.get("alias")
+
                 if alias_link:
+
                     # verificar se alias do link já foi utlizado
                     for link in links_existentes:
+
                         if link["alias"] == alias_link:
                             return make_response(jsonify({"msg": "alias já utilizada."}), 400)
                 else:
@@ -30,12 +38,13 @@ class crud_link(Resource):
                 with open(self.path_file, "w") as file_update:
                     novo_link = {
                         "alias": alias_link,
-                        "redirecionar": data
+                        "redirecionar": dados.get("url")
                     }
 
                     links_existentes.append(novo_link)
                     json.dump(links_existentes, file_update)
-                    return jsonify({"teu_link": f"https://www.benicio.cloud/{alias_link}"})
+
+                    return jsonify({"teu_link": f"{request.host}/{alias_link}"})
         else:
             return make_response(jsonify({"msg": "url inválida."}), 400)
 
