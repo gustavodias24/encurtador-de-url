@@ -12,7 +12,7 @@ def default_page():
 
 @redlinks_bp.route("/<string:alias>", methods=["GET"])
 def rediLink(alias):
-    with open(os.path.join(os.getcwd(), "blueprints", "raw-data", "data.json"), "r") as file:
+    with open(os.path.join(os.getcwd(), "api","blueprints", "raw-data", "data.json"), "r") as file:
         for link in json.loads(file.read()):
             if link["alias"] == alias:
                 return redirect(link["redirecionar"])

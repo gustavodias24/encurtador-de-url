@@ -11,7 +11,7 @@ api = Api(crud_bp)
 
 class crud_link(Resource):
     def __init__(self):
-        self.path_file = os.path.join(os.getcwd(), "blueprints", "raw-data", "data.json")
+        self.path_file = os.path.join(os.getcwd(), "api","blueprints", "raw-data", "data.json")
 
     def post(self):
         data = request.args.get("url")
