@@ -35,7 +35,7 @@ class crud_link(Resource):
 
                     links_existentes.append(novo_link)
                     json.dump(links_existentes, file_update)
-                    return jsonify({"url": "ok!"})
+                    return jsonify({"teu_link": f"https://www.benicio.cloud/{alias_link}"})
         else:
             return make_response(jsonify({"msg": "url inválida."}), 400)
 
