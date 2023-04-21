@@ -25,5 +25,4 @@ def default_page():
 def rediLink(alias):
     if dados := col.find_one({"alias": alias}):
         return redirect(dados["redirecionar"])
-    print()
-    return make_response(jsonify({"links_existentes": [i['alias'] for i in col.find()]}), 404)
+    return make_response(jsonify({"msg": "link not found"}), 404)
