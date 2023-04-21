@@ -1,6 +1,18 @@
 from flask import Blueprint, jsonify, make_response, redirect, request
-import os
-import json
+from decouple import config
+from pymongo import MongoClient
+
+client = MongoClient(
+    "mongodb+srv://{}:{}@clusterurls.wwd3kag.mongodb.net/?retryWrites=true&w=majority".format(
+        config("USER"),
+        config("PASS")
+    )
+)
+
+db = client["dataGeral"]
+col = db["colUrls"]
+
+
 
 redlinks_bp = Blueprint("redlinks_bp", __name__)
 
@@ -12,8 +24,6 @@ def default_page():
 
 @redlinks_bp.route("/<string:alias>", methods=["GET"])
 def rediLink(alias):
-    with open(os.path.join(os.getcwd(), "api","blueprints", "raw-data", "data.json"), "r") as file:
-        for link in json.loads(file.read()):
-            if link["alias"] == alias:
-                return redirect(link["redirecionar"])
-        return make_response(jsonify({"msg": "not found"}), 404)
+    if link := col.find_one({"alias": alias}):
+        return redirect(link["redirecionar"])
+    return make_response(jsonify({"msg": "not found"}), 404)
