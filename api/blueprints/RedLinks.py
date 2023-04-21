@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, make_response, redirect, request
+from flask import Blueprint, jsonify, make_response, redirect
 from decouple import config
 from pymongo import MongoClient
 
@@ -23,6 +23,7 @@ def default_page():
 
 @redlinks_bp.route("/<string:alias>", methods=["GET"])
 def rediLink(alias):
-        if dados := col.find_one({"alias": alias}):
-            return redirect(dados["redirecionar"])
-        return make_response(jsonify({"msg": "not found"}), 404)
+    if dados := col.find_one({"alias": alias}):
+        return redirect(dados["redirecionar"])
+    print()
+    return make_response(jsonify({"links_existentes": [i['alias'] for i in col.find()]}), 404)
