@@ -4,6 +4,5 @@ Disponível - > <a href="https://www.benicio.cloud/" target="_blank">https://www
 
 <img
 src="https://github.com/gustavodias24/encurtador-de-url/blob/main/screenshort.jpeg"
-alt="Imagem da aplicação"
-></img>
+alt="Imagem da aplicação">
 
