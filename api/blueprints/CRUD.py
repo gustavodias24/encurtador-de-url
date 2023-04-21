@@ -26,14 +26,15 @@ class crud_link(Resource):
         dados = request.get_json()
 
         if url(dados.get("url")):
-            alias_link = dados.get("alias")
+
+            alias_link = dados.get("alias").lower()
 
             if alias_link:
                 if col.find_one({"alias": alias_link}):
                     return make_response(jsonify({"msg": "alias já utilizada."}), 400)
 
                 col.insert_one({
-                        "alias": alias_link,
+                        "alias": alias_link.replace(" ", "%20"),
                         "redirecionar": dados.get("url")
                     })
 
