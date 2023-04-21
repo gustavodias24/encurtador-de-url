@@ -2,49 +2,51 @@ from flask.blueprints import Blueprint
 from flask import jsonify, request, make_response
 from flask_restful import Resource, Api
 from validators import url
-from decouple import config
-from pymongo import MongoClient
-
-client = MongoClient(
-    "mongodb+srv://{}:{}@clusterurls.wwd3kag.mongodb.net/?retryWrites=true&w=majority".format(
-        config("USER"),
-        config("PASS")
-    )
-)
-
-db = client["dataGeral"]
-col = db["colUrls"]
-
-
+import json
+import os
 
 crud_bp = Blueprint("crud_bp", __name__)
-api_crud = Api(crud_bp)
+api = Api(crud_bp)
 
 
 class crud_link(Resource):
-    def get(self):
+    def __init__(self):
+        self.path_file = os.path.join(os.getcwd(), "api","blueprints", "raw-data", "data.json")
 
-        dados = request.args
+    def post(self):
+
+        dados = request.get_json()
 
         if url(dados.get("url")):
 
-            alias_link = dados.get("alias")
+            with open(self.path_file, "r") as file:
 
-            if alias_link:
-                # verificar se alias do link já foi utlizado
-                if col.find_one({"alias": alias_link}):
-                    return make_response(jsonify({"msg": "alias já utilizada."}), 400)
-            else:
-                return make_response(jsonify({"msg": "digite um alias para o seu link."}), 400)
+                links_existentes = json.loads(file.read())
 
-            col.insert_one({
-                "alias": alias_link,
-                "redirecionar": dados.get("url")
-            })
+                alias_link = dados.get("alias")
 
-            return jsonify({"teu_link": f"{request.host}/{alias_link}"})
+                if alias_link:
+
+                    # verificar se alias do link já foi utlizado
+                    for link in links_existentes:
+
+                        if link["alias"] == alias_link:
+                            return make_response(jsonify({"msg": "alias já utilizada."}), 400)
+                else:
+                    return make_response(jsonify({"msg": "digite um alias para o seu link."}), 400)
+
+                with open(self.path_file, "w") as file_update:
+                    novo_link = {
+                        "alias": alias_link,
+                        "redirecionar": dados.get("url")
+                    }
+
+                    links_existentes.append(novo_link)
+                    json.dump(links_existentes, file_update)
+
+                    return jsonify({"teu_link": f"{request.host}/{alias_link}"})
         else:
             return make_response(jsonify({"msg": "url inválida."}), 400)
 
 
-api_crud.add_resource(crud_link, "/urls")
+api.add_resource(crud_link, "/urls")
