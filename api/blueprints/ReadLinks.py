@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, make_response, redirect
+from flask import Blueprint, jsonify, make_response, redirect, render_template
 from decouple import config
 from pymongo import MongoClient
 
@@ -13,15 +13,19 @@ db = client["dataGeral"]
 col = db["colUrls"]
 
 
-redlinks_bp = Blueprint("redlinks_bp", __name__)
+readLinks_bp = Blueprint("redlinks_bp", __name__)
 
 
-@redlinks_bp.route("/", methods=["GET"])
+@readLinks_bp.route("/", methods=["GET"])
 def default_page():
-    return jsonify({"msg": "Pagina em construcao..."})
+    obj_resp = {
+        "resultado": "",
+        "error": ""
+    }
+    return render_template("index.html", obj_resp=obj_resp)
 
 
-@redlinks_bp.route("/<string:alias>", methods=["GET"])
+@readLinks_bp.route("/<string:alias>", methods=["GET"])
 def rediLink(alias):
     if dados := col.find_one({"alias": alias}):
         return redirect(dados["redirecionar"])
