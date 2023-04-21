@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, make_response, redirect, request
-import os
-import json
+import api
+
 
 redlinks_bp = Blueprint("redlinks_bp", __name__)
 
@@ -12,8 +12,6 @@ def default_page():
 
 @redlinks_bp.route("/<string:alias>", methods=["GET"])
 def rediLink(alias):
-    with open(os.path.join(os.getcwd(), "api","blueprints", "raw-data", "data.json"), "r") as file:
-        for link in json.loads(file.read()):
-            if link["alias"] == alias:
-                return redirect(link["redirecionar"])
-        return make_response(jsonify({"msg": "not found"}), 404)
+    if link := api.col.find_one({"alias": alias}):
+        return redirect(link["redirecionar"])
+    return make_response(jsonify({"msg": "not found"}), 404)
